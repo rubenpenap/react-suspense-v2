@@ -1,3 +1,13 @@
+> ## 🚨 Important Notice
+>
+> This repository is a clone of the
+> [React Suspense](https://www.epicreact.dev/workshops/react-suspense/react-suspense-intro)
+> by Kent C. Dodds. It has been published solely to document my GitHub activity
+> and for personal educational purposes.
+>
+> **Note:** This is not an official fork or a maintained derivative of the
+> original project.
+
 <div>
   <h1 align="center"><a href="https://www.epicweb.dev/workshops">🔀 React Suspense</a></h1>
   <strong>
