@@ -1,23 +1,20 @@
 import { Suspense } from 'react'
 import * as ReactDOM from 'react-dom/client'
-// 💰 you're gonna want this
-// (unless you want to implement your own error boundary from scratch! 😅)
-// import { ErrorBoundary } from 'react-error-boundary'
+import { ErrorBoundary } from 'react-error-boundary'
 import { getImageUrlForShip, getShip, type Ship } from './utils.tsx'
 
-// 🐨 change this to a ship that doesn't exist (like 'Dreadyacht' 😆)
-const shipName = 'Dreadnought'
+const shipName = 'Dreadyacht'
 
 function App() {
 	return (
 		<div className="app-wrapper">
 			<div className="app">
 				<div className="details">
-					{/* 🐨 wrap this in an ErrorBoundary */}
-					{/* 💰 you can use the ShipError component below as the fallback prop */}
-					<Suspense fallback={<ShipFallback />}>
-						<ShipDetails />
-					</Suspense>
+					<ErrorBoundary fallback={<ShipError />}>
+						<Suspense fallback={<ShipFallback />}>
+							<ShipDetails />
+						</Suspense>
+					</ErrorBoundary>
 				</div>
 			</div>
 		</div>
@@ -25,14 +22,15 @@ function App() {
 }
 
 let ship: Ship
-// 🐨 create an error variable here
+let error: unknown
+
 const shipPromise = getShip(shipName).then(
 	(result) => (ship = result),
-	// 🐨 add an error handler here to assign the error to
+	(err) => (error = err),
 )
 
 function ShipDetails() {
-	// 🐨 if there was an error, throw it.
+	if (error) throw error
 	if (!ship) throw shipPromise
 
 	return (
