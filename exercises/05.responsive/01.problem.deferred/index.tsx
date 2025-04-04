@@ -1,4 +1,4 @@
-import { Suspense, use, useState, useTransition } from 'react'
+import { Suspense, use, useState, useTransition, useDeferredValue } from 'react'
 import * as ReactDOM from 'react-dom/client'
 import { ErrorBoundary } from 'react-error-boundary'
 import { useSpinDelay } from 'spin-delay'
@@ -57,11 +57,8 @@ function ShipSearch({
 	onSelection: (shipName: string) => void
 }) {
 	const [search, setSearch] = useState('')
-	// 🐨 remove the useTransition
-	const [isTransitionPending, startTransition] = useTransition()
-	// 🐨 call useDeferredValue with the search
-	// 🐨 update the argument passed to useSpinDelay to be search !== deferredSearch
-	const isPending = useSpinDelay(isTransitionPending, {
+	const deferredSearch = useDeferredValue(search)
+	const isPending = useSpinDelay(search !== deferredSearch, {
 		delay: 300,
 		minDuration: 350,
 	})
@@ -73,8 +70,7 @@ function ShipSearch({
 					type="search"
 					value={search}
 					onChange={(event) => {
-						// 🐨 remove the startTransition wrapper here
-						startTransition(() => setSearch(event.currentTarget.value))
+						setSearch(event.currentTarget.value)
 					}}
 				/>
 			</div>
@@ -87,8 +83,7 @@ function ShipSearch({
 			>
 				<ul style={{ opacity: isPending ? 0.6 : 1 }}>
 					<Suspense fallback={<SearchResultsFallback />}>
-						{/* 🐨 pass the deferredSearch here */}
-						<SearchResults search={search} onSelection={onSelection} />
+						<SearchResults search={deferredSearch} onSelection={onSelection} />
 					</Suspense>
 				</ul>
 			</ErrorBoundary>
