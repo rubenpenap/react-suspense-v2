@@ -1,4 +1,5 @@
 import { Suspense, use, useOptimistic, useState, useTransition } from 'react'
+import { useFormStatus } from 'react-dom'
 import * as ReactDOM from 'react-dom/client'
 import { ErrorBoundary, type FallbackProps } from 'react-error-boundary'
 import { useSpinDelay } from 'spin-delay'
@@ -26,7 +27,10 @@ function App() {
 				<div className="details" style={{ opacity: isPending ? 0.6 : 1 }}>
 					<ErrorBoundary fallback={<ShipError shipName={shipName} />}>
 						<Suspense fallback={<ShipFallback shipName={shipName} />}>
-							<ShipDetails shipName={shipName} optimisticShip={optimisticShip} />
+							<ShipDetails
+								shipName={shipName}
+								optimisticShip={optimisticShip}
+							/>
 						</Suspense>
 					</ErrorBoundary>
 				</div>
@@ -77,16 +81,21 @@ function CreateForm({
 							required
 						/>
 					</div>
-					{/* 🐨 create a CreateButton component and move this into it */}
-					<button type="submit">Create</button>
+					<CreateButton />
 				</form>
 			</ErrorBoundary>
 		</div>
 	)
 }
 
-// 🐨 create a CreateButton component here and get the form's pending state from useFormStatus
-// 🐨 if we're pending, set the button text to "Creating..." if not, it can be "Create"
+function CreateButton() {
+	const { pending } = useFormStatus()
+	return (
+		<button type="submit" disabled={pending}>
+			{pending ? 'Creating...' : 'Create'}
+		</button>
+	)
+}
 
 async function createOptimisticShip(formData: FormData) {
 	return {
