@@ -21,22 +21,22 @@ async function getShipImpl(name: string, delay?: number) {
 	return ship as Ship
 }
 
-// 🐨 create an imgCache here that's a map of string and Promise<string>
+const imgCache = new Map<string, Promise<string>>()
 
-// 🐨 export a function called imgSrc that takes a src string
-//   - check if there's a imgPromise in the imgCache for the src, if not, create one with preloadImage(src)
-//   - set the imgPromise in the imgCache
-//   - return the imgPromise
+export function imgSrc(src: string) {
+	const imgPromise = imgCache.get(src) ?? preloadImage(src)
+	imgCache.set(src, imgPromise)
+	return imgPromise
+}
 
-// 💰 here's a function you can use to wait for the image to be ready to display
-// function preloadImage(src: string) {
-// 	return new Promise<string>(async (resolve, reject) => {
-// 		const img = new Image()
-// 		img.src = src
-// 		img.onload = () => resolve(src)
-// 		img.onerror = reject
-// 	})
-// }
+function preloadImage(src: string) {
+	return new Promise<string>(async (resolve, reject) => {
+		const img = new Image()
+		img.src = src
+		img.onload = () => resolve(src)
+		img.onerror = reject
+	})
+}
 
 // added the version to prevent caching to make testing easier
 const version = Date.now()
