@@ -27,7 +27,10 @@ function App() {
 				<div className="details" style={{ opacity: isPending ? 0.6 : 1 }}>
 					<ErrorBoundary fallback={<ShipError shipName={shipName} />}>
 						<Suspense fallback={<ShipFallback shipName={shipName} />}>
-							<ShipDetails shipName={shipName} optimisticShip={optimisticShip} />
+							<ShipDetails
+								shipName={shipName}
+								optimisticShip={optimisticShip}
+							/>
 						</Suspense>
 					</ErrorBoundary>
 				</div>
@@ -47,19 +50,19 @@ function CreateForm({
 	setOptimisticShip: (ship: Ship | null) => void
 	setShipName: (name: string) => void
 }) {
-	// 🐨 call useOptimistic for message and setMessage (initialize to 'Create')
+	const [message, setMessage] = useOptimistic('Create')
 	return (
 		<div>
 			<p>Create a new ship</p>
 			<ErrorBoundary FallbackComponent={FormErrorFallback}>
 				<form
 					action={async (formData) => {
-						// 🐨 set the message to "Creating..."
+						setMessage('Creating...')
 						setOptimisticShip(await createOptimisticShip(formData))
 
 						await createShip(formData, 2000)
 
-						// 🐨 set the message to "Created! Loading..."
+						setMessage('Created! Loading...')
 
 						setShipName(formData.get('name') as string)
 					}}
@@ -82,22 +85,18 @@ function CreateForm({
 							required
 						/>
 					</div>
-					{/* 🐨 pass the message as children */}
-					<CreateButton />
+					<CreateButton>{message}</CreateButton>
 				</form>
 			</ErrorBoundary>
 		</div>
 	)
 }
 
-// 🐨 accept children
-// 🦺 the type for children is React.ReactNode
-function CreateButton() {
+function CreateButton({ children }: { children: React.ReactNode }) {
 	const { pending } = useFormStatus()
 	return (
 		<button type="submit" disabled={pending}>
-			{/* 🐨 remove this and put children in its place */}
-			{pending ? 'Creating...' : 'Create'}
+			{children}
 		</button>
 	)
 }
